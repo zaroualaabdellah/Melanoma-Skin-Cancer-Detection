@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        img {
+            max-width: 300px;
+            max-height: 300px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Classification d'Images</h1>
+    <input type="file" id="imageInput" accept="image/*">
+    <button id="predictButton">Tester l'image</button>
+    
+    <div id="result"></div>
+    <img id="selectedImage" src="" alt="Aperçu de l'image sélectionnée" style="display:none;">
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const predictButton = document.getElementById('predictButton');
+        const resultDiv = document.getElementById('result');
+        const selectedImage = document.getElementById('selectedImage');
+
+        // Afficher l'image sélectionnée
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedImage.src = e.target.result;
+                    selectedImage.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Envoyer l'image au serveur pour prédiction
+        predictButton.addEventListener('click', async function() {
+            const file = imageInput.files[0];
+            if (!file) {
+                alert("Veuillez sélectionner une image.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            resultDiv.innerHTML = `<h2>Résultat : ${result.label}</h2>`;
+        });
+    </script>
+
+</body>
+</html>
