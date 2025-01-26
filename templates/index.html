@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Détection de mélanome</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Détection de mélanome</h1>
+        <form action="/predict" method="post" enctype="multipart/form-data" class="mb-4">
+            <div class="mb-3">
+                <label for="firstName" class="form-label">Prénom</label>
+                <input class="form-control" type="text" name="first_name" id="firstName" required>
+            </div>
+            <div class="mb-3">
+                <label for="lastName" class="form-label">Nom</label>
+                <input class="form-control" type="text" name="last_name" id="lastName" required>
+            </div>
+            <div class="mb-3">
+                <label for="dob" class="form-label">Date de naissance</label>
+                <input class="form-control" type="date" name="dob" id="dob" required>
+            </div>
+            <div class="mb-3">
+                <label for="gender" class="form-label">Sexe</label>
+                <select class="form-select" name="gender" id="gender" required>
+                    <option value="">Sélectionnez votre sexe</option>
+                    <option value="male">Homme</option>
+                    <option value="female">Femme</option>
+                    <option value="other">Autre</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="fileInput" class="form-label">Télécharger une image</label>
+                <input class="form-control" type="file" name="file" id="fileInput" accept="image/*" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Télécharger et prédire</button>
+        </form>
+
+        <h2 class="text-center mb-4">Visualisation des courbes</h2>
+        
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <h3>Précision</h3>
+                <img src="{{ url_for('static', filename='accuracy_plot.png') }}" alt="Accuracy Plot" class="img-fluid">
+            </div>
+            <div class="col-md-6 mb-4">
+                <h3>Perte</h3>
+                <img src="{{ url_for('static', filename='loss_plot.png') }}" alt="Loss Plot" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js" integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</body>
+</html>
