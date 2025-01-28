@@ -7,6 +7,15 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from flask import Flask, request, render_template, redirect
+import mysql.connector
+
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="melanoma_db"
+)
+cursor = db.cursor()
 
 # --- Paramètres globaux ---
 data_dir = "dataset/"  # Dossier contenant les images 'benign' et 'malignant'
@@ -123,6 +132,9 @@ def index():
 @app.route('/predict', methods=['POST'])
 def upload_file():
     print("********************************************")
+    name = request.form.get('name') 
+    gender = request.form.get('gender')
+    date_naissance = request.form.get('dob')
     if 'file' not in request.files:
         return redirect(request.url)
     
@@ -136,7 +148,14 @@ def upload_file():
 
     # Prédire l'image
     result = predict_image(image_path)
-    return render_template('result.html', result=result)
+    sql = """
+    INSERT INTO patients (name, gender, date_of_birth, melanoma_test_result, image_path)
+    VALUES (%s, %s, %s, %s, %s)"""
+    values = (name, gender, date_naissance, result, 'image_path')
+    cursor.execute(sql, values)
+    db.commit()
+    return render_template('result.html', result=result, name=name, sexe=gender, date_naissance=date_naissance)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

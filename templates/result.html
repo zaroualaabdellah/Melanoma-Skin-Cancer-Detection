@@ -3,11 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Résultat de Prédiction</title>
+    <title>Résultat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Résultat de Prédiction</h1>
-    <p>Le résultat pour l'image téléchargée est : <strong>{{ result }}</strong></p>
-    <a href="/">Télécharger une autre image</a>
+
+    <h1>Résultat du Test</h1>
+    <p><strong>Nom :</strong> {{ name }}</p>
+    <p><strong>Sexe :</strong> {{ sexe }}</p>
+    <p><strong>Date de naissance :</strong> {{ date_naissance }}</p>
+    <p><strong>Résultat :</strong> {{ result }}</p>
+
+    <a href="/">Revenir à l'accueil</a>
+
 </body>
 </html>

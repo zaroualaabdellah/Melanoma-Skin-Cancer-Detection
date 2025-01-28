@@ -9,37 +9,46 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center mb-4">Détection de mélanome</h1>
-        <form action="/predict" method="post" enctype="multipart/form-data" class="mb-4">
+        
+        <!-- Alertes pour le feedback utilisateur -->
+        {% if success_message %}
+        <div class="alert alert-success">{{ success_message }}</div>
+        {% elif error_message %}
+        <div class="alert alert-danger">{{ error_message }}</div>
+        {% endif %}
+        
+        <form action="/predict" method="post" enctype="multipart/form-data" class="mb-4"> 
             <div class="mb-3">
-                <label for="firstName" class="form-label">Prénom</label>
-                <input class="form-control" type="text" name="first_name" id="firstName" required>
-            </div>
-            <div class="mb-3">
-                <label for="lastName" class="form-label">Nom</label>
-                <input class="form-control" type="text" name="last_name" id="lastName" required>
-            </div>
+                <label for="lastName" class="form-label">Nom et Prénom</label>
+                <input class="form-control" type="text" name="last_name" id="lastName" required placeholder="Entrez nom et prénom">
+            </div> 
             <div class="mb-3">
                 <label for="dob" class="form-label">Date de naissance</label>
-                <input class="form-control" type="date" name="dob" id="dob" required>
-            </div>
+                <input class="form-control" type="date" name="dob" id="dob" required min="1900-01-01" max="{{ current_date }}">
+            </div> 
             <div class="mb-3">
                 <label for="gender" class="form-label">Sexe</label>
                 <select class="form-select" name="gender" id="gender" required>
-                    <option value="">Sélectionnez votre sexe</option>
-                    <option value="male">Homme</option>
-                    <option value="female">Femme</option>
-                    <option value="other">Autre</option>
+                    <option value="">Sélectionnez  sexe</option>
+                    <option value="homme">Homme</option>
+                    <option value="Femme">Femme</option> 
                 </select>
             </div>
+
+            <!-- Champ Téléchargement de fichier -->
             <div class="mb-3">
                 <label for="fileInput" class="form-label">Télécharger une image</label>
                 <input class="form-control" type="file" name="file" id="fileInput" accept="image/*" required>
+                <small class="form-text text-muted">Formats acceptés : JPG, PNG, JPEG.</small>
             </div>
+
+            <!-- Bouton de soumission -->
             <button type="submit" class="btn btn-primary">Télécharger et prédire</button>
         </form>
 
         <h2 class="text-center mb-4">Visualisation des courbes</h2>
         
+        <!-- Visualisation des courbes -->
         <div class="row">
             <div class="col-md-6 mb-4">
                 <h3>Précision</h3>
@@ -52,6 +61,7 @@
         </div>
     </div>
 
+    <!-- Scripts Bootstrap -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js" integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>
