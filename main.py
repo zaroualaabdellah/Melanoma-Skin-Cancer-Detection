@@ -129,6 +129,36 @@ app = Flask(__name__)
 def index():
     return render_template('index.html', history=training_history)
 
+@app.route('/test')
+def test_melanoma():
+    return render_template('test.html')
+
+@app.route('/patients')
+def list_patients():
+   # Liste des colonnes spécifiques avec leurs alias
+    specific_columns_with_alias = {
+        'id': 'Identifiant',
+        'name': 'Nom',
+        'gender': 'Sexe',
+        'date_of_birth': 'Date de naissance',
+        'melanoma_test_result': 'Résultat du test de mélanome',
+        'upload_date': 'Date d\'importation'
+    }
+
+    # Créer une chaîne de caractères contenant les colonnes spécifiques avec alias
+    columns_string = ', '.join(f"`{col}` AS `{alias}`" for col, alias in specific_columns_with_alias.items())
+
+    # Exécuter la requête pour récupérer les données des colonnes spécifiques
+    cursor.execute(f"SELECT {columns_string} FROM `patients`")
+    patients = cursor.fetchall()
+
+    # Utiliser les alias pour afficher les noms de colonnes dans le template
+    columns = list(specific_columns_with_alias.values())  # Obtenir uniquement les alias
+
+    return render_template('patients.html', patients=patients, columns=columns)
+
+
+
 @app.route('/predict', methods=['POST'])
 def upload_file():
     print("********************************************")
