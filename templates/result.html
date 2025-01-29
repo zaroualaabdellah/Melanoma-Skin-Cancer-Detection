@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <title>Détection de Mélanome</title>
-</head>
+    <title>Page de Résultat</title>
+    <!-- Lien vers Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
+</head>
 <body>
-    <!-- Barre de navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">MelanomaApp</a>
@@ -34,63 +33,33 @@
         </div>
     </nav>
     <div class="container mt-5">
-        <!-- Alertes pour le feedback utilisateur -->
-        {% if success_message %}
-        <div class="alert alert-success">{{ success_message }}</div>
-        {% elif error_message %}
-        <div class="alert alert-danger">{{ error_message }}</div>
-        {% endif %}
-
-        <form action="/predict" method="post" enctype="multipart/form-data" class="mb-4">
-            <!-- Champ Prénom -->
-            <div class="mb-3">
-                <label for="firstName" class="form-label">Prénom</label>
-                <input class="form-control" type="text" name="first_name" id="firstName" required
-                    placeholder="Entrez votre prénom">
+        <div class="card">
+            <div class="card-header">
+                Résultats
             </div>
-
-            <!-- Champ Nom -->
-            <div class="mb-3">
-                <label for="lastName" class="form-label">Nom</label>
-                <input class="form-control" type="text" name="last_name" id="lastName" required
-                    placeholder="Entrez votre nom">
+            <div class="card-body">
+                <h5 class="card-title">Détails de l'utilisateur</h5>
+                <p class="card-text"><strong>Nom :</strong> {{ name }}</p>
+                <p class="card-text"><strong>Genre :</strong> {{ sexe }}</p>
+                <p class="card-text"><strong>Date de Naissance :</strong> {{ date_naissance }}</p> 
+                <p class="card-text">
+                    <strong>Résultat :</strong>
+                    {% if result == 'Benign' %}
+                        <i class="fas fa-check-circle" style="color: green;"></i> Benign
+                    {% elif result == 'Malignant' %}
+                        <i class="fas fa-times-circle" style="color: red;"></i> Malignant
+                    {% else %}
+                        <i class="fas fa-question-circle" style="color: gray;"></i> Inconnu
+                    {% endif %}
+                </p>
             </div>
-
-            <!-- Champ Date de naissance -->
-            <div class="mb-3">
-                <label for="dob" class="form-label">Date de naissance</label>
-                <input class="form-control" type="date" name="dob" id="dob" required min="1900-01-01"
-                    max="{{ current_date }}">
-            </div>
-
-            <!-- Champ Sexe -->
-            <div class="mb-3">
-                <label for="gender" class="form-label">Sexe</label>
-                <select class="form-select" name="gender" id="gender" required>
-                    <option value="">Sélectionnez votre sexe</option>
-                    <option value="male">Homme</option>
-                    <option value="female">Femme</option>
-                    <option value="other">Autre</option>
-                </select>
-            </div>
-
-            <!-- Champ Téléchargement de fichier -->
-            <div class="mb-3">
-                <label for="fileInput" class="form-label">Télécharger une image</label>
-                <input class="form-control" type="file" name="file" id="fileInput" accept="image/*" required>
-                <small class="form-text text-muted">Formats acceptés : JPG, PNG, JPEG.</small>
-            </div>
-
-            <!-- Bouton de soumission -->
-            <button type="submit" class="btn btn-primary">Télécharger et prédire</button>
-        </form>
+        </div>
+        <a href="/">Autre Test</a>
     </div>
 
-
-    <!-- Scripts Bootstrap -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"
-        integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Lien vers Bootstrap JS et dépendances (facultatif, mais recommandé pour les composants JS) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-
 </html>

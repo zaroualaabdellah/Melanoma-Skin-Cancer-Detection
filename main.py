@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect , jsonify
 import mysql.connector
 
 db = mysql.connector.connect(
@@ -15,6 +15,14 @@ db = mysql.connector.connect(
     password="",
     database="melanoma_db"
 )
+def get_db_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="melanoma_db"
+    )
+
 cursor = db.cursor()
 
 # --- Paramètres globaux ---
@@ -186,6 +194,88 @@ def upload_file():
     db.commit()
     return render_template('result.html', result=result, name=name, sexe=gender, date_naissance=date_naissance)
 
+@app.route('/api/gender_counts')
+def get_gender_counts():
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT gender, COUNT(*) FROM patients GROUP BY gender")
+    results = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return jsonify(results)
 
+@app.route('/api/test_result_counts')
+def get_test_result_counts():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT melanoma_test_result, COUNT(*) FROM patients GROUP BY melanoma_test_result")
+        results = cursor.fetchall()
+
+        # Format results as a list of dictionaries
+        test_results = [{'melanoma_test_result': row[0], 'count': row[1]} for row in results]
+
+        cursor.close()
+        connection.close()
+        
+        return jsonify(test_results)  # Return formatted JSON response
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500  # Return error message if something goes wrong
+    
+@app.route('/api/age_distribution')
+def get_age_distribution():
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    # Calculate age groups based on the date_of_birth
+    query = """
+    SELECT 
+        CASE 
+            WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 0 AND 17 THEN '0-17'
+            WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 18 AND 29 THEN '18-29'
+            WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 30 AND 44 THEN '30-44'
+            WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 45 AND 59 THEN '45-59'
+            ELSE '60+' 
+        END AS age_group,
+        COUNT(*) AS count
+    FROM patients
+    WHERE melanoma_test_result = 'Malignant'
+    GROUP BY age_group
+    """
+
+    cursor.execute(query)
+    results = cursor.fetchall()
+    cursor.close()
+    connection.close()
+
+    # Format the results as a list of dictionaries
+    age_distribution = [{'age_group': row[0], 'count': row[1]} for row in results]
+
+    return jsonify(age_distribution)
+
+@app.route('/api/positive_test_counts_by_gender')
+def get_positive_test_counts_by_gender():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("""
+            SELECT gender, COUNT(*) 
+            FROM patients 
+            WHERE melanoma_test_result = 'Malignant' 
+            GROUP BY gender
+        """)
+        results = cursor.fetchall()
+
+        # Format results as a list of dictionaries
+        positive_test_counts = [{'gender': row[0], 'count': row[1]} for row in results]
+
+        cursor.close()
+        connection.close()
+        
+        return jsonify(positive_test_counts)  # Return formatted JSON response
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500  # Return error message if something goes wrong
 if __name__ == '__main__':
     app.run(debug=True)

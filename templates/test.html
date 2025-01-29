@@ -41,18 +41,10 @@
         <div class="alert alert-danger">{{ error_message }}</div>
         {% endif %}
 
-        <form action="/predict" method="post" enctype="multipart/form-data" class="mb-4">
-            <!-- Champ Prénom -->
+        <form action="/predict" method="post" enctype="multipart/form-data" class="mb-4">            
             <div class="mb-3">
-                <label for="firstName" class="form-label">Prénom</label>
-                <input class="form-control" type="text" name="first_name" id="firstName" required
-                    placeholder="Entrez votre prénom">
-            </div>
-
-            <!-- Champ Nom -->
-            <div class="mb-3">
-                <label for="lastName" class="form-label">Nom</label>
-                <input class="form-control" type="text" name="last_name" id="lastName" required
+                <label for="name" class="form-label">Nom</label>
+                <input class="form-control" type="text" name="name" id="name" required
                     placeholder="Entrez votre nom">
             </div>
 
@@ -68,9 +60,8 @@
                 <label for="gender" class="form-label">Sexe</label>
                 <select class="form-select" name="gender" id="gender" required>
                     <option value="">Sélectionnez votre sexe</option>
-                    <option value="male">Homme</option>
-                    <option value="female">Femme</option>
-                    <option value="other">Autre</option>
+                    <option value="Homme">Homme</option>
+                    <option value="Femme">Femme</option> 
                 </select>
             </div>
 

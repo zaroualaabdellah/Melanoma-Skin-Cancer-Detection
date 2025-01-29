@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Détection de Mélanome</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .card {
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 400px;
+            /* Adjust the height for your charts */
+        }
+    </style>
 </head>
 <body>
     <!-- Barre de navigation -->
@@ -31,11 +56,44 @@
     </nav>
 
     <!-- Contenu principal -->
-    <div class="container mt-5">
-       
-        <h2 class="text-center mb-4">Visualisation des courbes</h2>
-        
-        <!-- Visualisation des courbes -->
+    <div class="container">
+        <h2 class="text-center text-primary mb-4">Statistiques des Patients</h2>
+
+        <div class="row">
+            <!-- Gender Chart -->
+            <div class="col-md-6">
+                <div class="card">
+                    <h5 class="card-title text-center">Nombre de patients par sexe
+                    </h5>
+                    <canvas height="200" id="genderChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Melanoma Test Result Chart -->
+            <div class="col-md-6">
+                <div class="card">
+                    <h5 class="card-title text-center">Patients par Résultat de Test de Mélanome</h5>
+                    <canvas height="200" id="testResultChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Age Distribution Chart -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <h5 class="card-title text-center">Répartition par Âge des Patients</h5>
+                    <canvas height="300" id="ageDistributionChart"></canvas>
+                </div>
+            </div>
+            <!-- Positive Test Result by Gender Chart -->
+            <div class="col-md-6">
+                <div class="card">
+                    <h5 class="card-title text-center">Résultats des Tests de Mélanome Malin par Genre</h5>
+                    <canvas id="positiveTestGenderChart"></canvas>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-6 mb-4">
                 <h3>Précision</h3>
@@ -47,8 +105,144 @@
             </div>
         </div>
     </div>
-
     <!-- Scripts Bootstrap -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js" integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // Récupération des données de genre
+        fetch('/api/gender_counts')
+            .then(response => response.json())
+            .then(data => {
+                var genderLabels = data.map(item => item[0]); // Gender labels
+                var genderData = data.map(item => item[1]); // Gender counts
+
+                var ctx1 = document.getElementById('genderChart').getContext('2d');
+                new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: genderLabels,
+                        datasets: [{
+                            label: 'Number of Patients',
+                            data: genderData,
+                            backgroundColor: ['#3498db', '#e74c3c'],
+                            borderColor: ['#2980b9', '#c0392b'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+
+        // Récupération des résultats de test de mélanome
+        fetch('/api/test_result_counts')
+            .then(response => response.json())
+            .then(data => {
+                // Handle the test result counts data
+                var labels = data.map(item => item.melanoma_test_result); // Extract test result labels
+                var counts = data.map(item => item.count); // Extract counts
+
+                var ctx2 = document.getElementById('testResultChart').getContext('2d');
+                new Chart(ctx2, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Number of Patients by Test Result',
+                            data: counts,
+                            backgroundColor: ['#2ecc71', '#e67e22', '#9b59b6'], // Add more colors as needed
+                            borderColor: '#ffffff',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        maintainAspectRatio: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching test result counts:', error);
+            });
+
+
+        // Récupération de la distribution des âges
+        fetch('/api/age_distribution')
+            .then(response => response.json())
+            .then(data => {
+                var ageLabels = data.map(item => item.age_group); // Age group labels
+                var ageData = data.map(item => item.count); // Age counts
+
+                var ctx3 = document.getElementById('ageDistributionChart').getContext('2d');
+                new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: ageLabels,
+                        datasets: [{
+                            label: 'Number of Patients by Age',
+                            data: ageData,
+                            backgroundColor: '#3498db',
+                            borderColor: '#2980b9',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+
+
+        fetch('/api/positive_test_counts_by_gender')
+            .then(response => response.json())
+            .then(data => {
+                var labels = data.map(item => item.gender); // Extract gender labels
+                var counts = data.map(item => item.count); // Extract counts
+
+                var ctx = document.getElementById('positiveTestGenderChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Number of Positive Test Results',
+                            data: counts,
+                            backgroundColor: '#3498db',
+                            borderColor: '#2980b9',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching positive test counts by gender:', error);
+            });
+    </script>
 </body>
 </html>
